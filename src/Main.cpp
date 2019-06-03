@@ -46,6 +46,7 @@ int main() {
 	TH1F* station = new TH1F("station", "Station hit", 5, 0, 5);
 	TH1F* chamber = new TH1F("chamber", "Chamber hit", 36, 0, 36);
 	TH1F* group_count = new TH1F("group_count", "Group Count", 10, -.5, 9.5);
+	TH1F* lct_count = new TH1F("lct_count", "Total LCT Count", 10, 0, 10);
 	// END DECLARE HISTOGRAMS
 
 	unsigned int group_cnt = 0;
@@ -61,31 +62,38 @@ int main() {
 		float trk_phi = 0;        
 		int trk_sta = 0;
 		int trk_chm = 0;
+		int trk_nei = 0;
 		unsigned int vec_row = -1;
+		bool flag = false;
 		
                 for (unsigned int i_track = 0; i_track < ntuple.I("nHits"); i_track++) {
                 	trk_eta = ntuple.F("hit_eta", i_track);
 			trk_phi = ntuple.F("hit_phi", i_track);
 			trk_sta = ntuple.I("hit_station", i_track);
 			trk_chm = ntuple.I("hit_chamber", i_track);
+			trk_nei = ntuple.I("hit_neighbor", i_track);
 			trk_location.push_back(vector<float>());
 			trk_location[i_track].push_back(trk_eta);
 			trk_location[i_track].push_back(trk_phi);
 			trk_location[i_track].push_back(trk_sta);
 			trk_location[i_track].push_back(trk_chm);
+			trk_location[i_track].push_back(trk_nei);
                 }
 
 		sort(trk_location.begin(), trk_location.end(), sortcol);
 
 		for (unsigned int i=0;i<trk_location.size();i++) {
+			if (trk_location[i][4] == 1) {continue;}
 			for (unsigned int j=i;j<trk_location.size();j++) {
-				if (abs(trk_location[i][0]-trk_location[j][0]) < .1 && abs(trk_location[i][1]-trk_location[j][1]) < 1 && trk_location[i][2] > 1 && trk_location[i][2] == trk_location[j][2] && trk_location[i][3] == trk_location[j][3]){
+				if (abs(trk_location[i][0]-trk_location[j][0]) < .1 && abs(trk_location[i][1]-trk_location[j][1]) < 1 /*&& trk_location[i][2] > 1 */&& trk_location[i][2] == trk_location[j][2] && trk_location[i][3] == trk_location[j][3]){
+					flag = false;
 					for (unsigned int test=0;test<grouping.size();test++) {
-						if (grouping[test][0] == trk_location[j][0] && grouping[test][1] == trk_location[j][1]) {
+						if (grouping[test][0] == trk_location[j][0] && grouping[test][1] == trk_location[j][1] && grouping[test][2] == trk_location[j][2]) {
 							//cout << "We got an overlap yo in chan " << trk_location[j][3] << " and chan " << grouping[test][3] << endl;
-							continue;;
+							flag = true;
+							break;
 						}
-					}
+					} if (flag) {continue;}
 					grouping.push_back(vector<float>());
 					vec_row++;
 					for (unsigned int k=0;k<4;k++) {
