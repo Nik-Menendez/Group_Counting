@@ -21,10 +21,16 @@
 
 using namespace std;
 
-// SORTER
-bool sortcol ( const vector<float>& v1, const vector<float>& v2 ) {
+// SORTER BY ETA
+bool sortcol1 ( const vector<float>& v1, const vector<float>& v2 ) {
 	return v1[0] < v2[0];
 }
+
+// SORTER BY SECTOR
+bool sortcol2 ( const vector<float>& v1, const vector<float>& v2 ) {
+        return v1[9] < v2[9];
+}
+
 
 // MAIN
 int main() {
@@ -41,6 +47,15 @@ int main() {
 	// END LOAD FILES
 
 	// DECLARE HISTOGRAMS	
+	TH1F* zone0CSC = new TH1F("zone0CSC", "nHits in Zone 0 CSCs", 30, 0, 30);
+	TH1F* zone0tot = new TH1F("zone0tot", "nHits in Zone 0", 30, 0, 30);
+	TH1F* zone1CSC = new TH1F("zone1CSC", "nHits in Zone 1 CSCs", 30, 0, 30);
+        TH1F* zone1tot = new TH1F("zone1tot", "nHits in Zone 1", 30, 0, 30);
+	TH1F* zone2CSC = new TH1F("zone2CSC", "nHits in Zone 2 CSCs", 30, 0, 30);
+        TH1F* zone2tot = new TH1F("zone2tot", "nHits in Zone 2", 30, 0, 30);
+	TH1F* zone3CSC = new TH1F("zone3CSC", "nHits in Zone 3 CSCs", 30, 0, 30);
+        TH1F* zone3tot = new TH1F("zone3tot", "nHits in Zone 3", 30, 0, 30);
+
 	TH1F* eta = new TH1F("eta", "Eta values of hits", 50, -2.5, 2.5);
 	TH1F* phi = new TH1F("phi", "Phi values of hits", 100, -200, 200);
 	TH1F* station = new TH1F("station", "Station hit", 5, 0, 5);
@@ -52,7 +67,7 @@ int main() {
 	TH1F* station_group = new TH1F("station_group", "Station hit", 5, 0, 5);
 	TH1F* chamber_group = new TH1F("chamber_group", "Chamber hit", 36, 0, 36);
 	TH1F* group_size = new TH1F("group_size", "Number of Hits in a Group", 6, 0, 6);
-	TH1F* delt_phi = new TH1F("delt_phi", "Difference in Phi Values", 20, 0, 4);
+	TH1F* delt_phi = new TH1F("delt_phi", "Difference in Phi Values", 200, 0, 4);
 	// END DECLARE HISTOGRAMS
 
 	unsigned int group_cnt = 0;
@@ -64,42 +79,72 @@ int main() {
 
                 vector< vector<float> > trk_location;
 		vector< vector<float> > grouping;
-       		float trk_eta = 0;      
-		float trk_phi = 0;        
-		int trk_sta = 0;
-		int trk_chm = 0;
-		int trk_nei = 0;
-		int trk_BX = 0;
-		int isCSC = 0;
-		int trk_qua = 0;
-		unsigned int vec_row = -1;
+		vector<int> zone_counts;
+		for (int i=0;i<8;i++) {zone_counts.push_back(0);}
+       		unsigned int vec_row = -1;
 		bool flag = false;
 		int lct_cnt = 0;
+		int last_j = 0;
 		
                 for (unsigned int i_track = 0; i_track < ntuple.I("nHits"); i_track++) {
-			trk_BX = ntuple.I("hit_BX", i_track);
-			isCSC = ntuple.I("hit_isCSC", i_track);
-			trk_qua = ntuple.I("hit_quality", i_track);
-                	trk_eta = ntuple.F("hit_eta", i_track);
-			trk_phi = ntuple.F("hit_phi", i_track);
-			trk_sta = ntuple.I("hit_station", i_track);
-			trk_chm = ntuple.I("hit_chamber", i_track);
-			trk_nei = ntuple.I("hit_neighbor", i_track);
 			trk_location.push_back(vector<float>());
-			trk_location[i_track].push_back(trk_eta);
-			trk_location[i_track].push_back(trk_phi);
-			trk_location[i_track].push_back(trk_sta);
-			trk_location[i_track].push_back(trk_chm);
-			trk_location[i_track].push_back(trk_nei);
-                	trk_location[i_track].push_back(trk_BX);
-			trk_location[i_track].push_back(isCSC);
-			trk_location[i_track].push_back(trk_qua);
+			trk_location[i_track].push_back(ntuple.F("hit_eta",i_track));
+			trk_location[i_track].push_back(ntuple.F("hit_phi",i_track));
+			trk_location[i_track].push_back(ntuple.I("hit_station",i_track));
+			trk_location[i_track].push_back(ntuple.I("hit_chamber",i_track));
+			trk_location[i_track].push_back(ntuple.I("hit_neighbor",i_track));
+                	trk_location[i_track].push_back(ntuple.I("hit_BX",i_track));
+			trk_location[i_track].push_back(ntuple.I("hit_isCSC",i_track));
+			trk_location[i_track].push_back(ntuple.I("hit_quality",i_track));
+			trk_location[i_track].push_back(ntuple.F("hit_theta",i_track));
+			trk_location[i_track].push_back(ntuple.I("hit_sector_index",i_track));
 		}
 
-		sort(trk_location.begin(), trk_location.end(), sortcol);
+		sort(trk_location.begin(), trk_location.end(), sortcol2);
 
 		for (unsigned int i=0;i<trk_location.size();i++) {
-			if (trk_location[i][4] == 1 || !(trk_location[i][5] == 0 && trk_location[i][6] == 1 && trk_location[i][7] > -100)) {continue;}
+                        if (trk_location[i][4] == 1 || !(trk_location[i][5] == 0 /*&& trk_location[i][6] == 1 && trk_location[i][7] > -100*/)) {continue;}			
+
+			for (unsigned int j=i;j<trk_location.size();j++) {
+				if (trk_location[i][9] != trk_location[j][9]) {
+					break;
+				} else if (trk_location[i][9] == trk_location[j][9]) {
+					if (trk_location[i][8] >= 8.5 && trk_location[i][8] <= 20.8) {
+                                		if (trk_location[i][6] == 0) {
+                                        		zone_counts[0]++;
+                                		}
+                                		zone_counts[1]++;
+                        		} else if (trk_location[i][8] >= 19.9 && trk_location[i][8] <= 23.0) {
+                                		if (trk_location[i][6] == 0) {
+                                        		zone_counts[2]++;
+                                		}
+                                		zone_counts[3]++;
+                        		} else if (trk_location[i][8] >= 22.2 && trk_location[i][8] <= 33.9) {
+                                		if (trk_location[i][6] == 0) {
+                                        		zone_counts[4]++;
+                                		}
+                                		zone_counts[5]++;
+                        		} else if (trk_location[i][8] >= 33.0 && trk_location[i][8] <= 44.7) {
+                                		if (trk_location[i][6] == 0) {
+                                       		 zone_counts[6]++;
+                                		}
+                         		       zone_counts[7]++;
+                        		}
+				}
+				last_j = j;
+			}
+
+			i=last_j;
+
+			
+		} 
+
+		sort(trk_location.begin(), trk_location.end(), sortcol1);
+
+		for (unsigned int i=0;i<trk_location.size();i++) {
+			if (trk_location[i][4] == 1 || !(trk_location[i][5] == 0 /*&& trk_location[i][6] == 1 && trk_location[i][7] > -100*/)) {continue;}
+
+			if (!(trk_location[i][6] == 1)) {continue;}
 
 			eta->Fill(trk_location[i][0]);
 			phi->Fill(trk_location[i][1]);
@@ -108,6 +153,7 @@ int main() {
 			lct_cnt++;
 
 			for (unsigned int j=i;j<trk_location.size();j++) {
+
 				if (abs(trk_location[i][0]-trk_location[j][0]) < .1 && abs(trk_location[i][1]-trk_location[j][1]) < 4 /*&& trk_location[i][2] > 1 */&& trk_location[i][2] == trk_location[j][2] /*&& trk_location[i][3] == trk_location[j][3]*/){
 					flag = false;
 					delt_phi->Fill(trk_location[i][1] - trk_location[j][1]);
@@ -140,6 +186,16 @@ int main() {
 			vec_row = -1;
 		}
 
+		zone0CSC->Fill(zone_counts[0]);
+		zone0tot->Fill(zone_counts[1]);
+		zone1CSC->Fill(zone_counts[2]);
+                zone1tot->Fill(zone_counts[3]);
+		zone2CSC->Fill(zone_counts[4]);
+                zone2tot->Fill(zone_counts[5]);
+		zone3CSC->Fill(zone_counts[6]);
+                zone3tot->Fill(zone_counts[7]);
+		zone_counts.clear();
+
 		group_count->Fill(group_cnt);
 		lct_count->Fill(lct_cnt);
 		group_cnt = 0;
@@ -153,11 +209,30 @@ int main() {
 	// OUTPUT
 	TFile myPlot("plots/eta_cpp.root", "RECREATE");
 
+	TDirectory* Total_Counts = myPlot.mkdir("Total Counts");
+	TDirectory* Zone_Counts = myPlot.mkdir("Zone Counts");
+	TDirectory* Cluster_Counts = myPlot.mkdir("Cluster Counts");
+
+	Zone_Counts->cd();
+
+	zone0CSC->Write();
+	zone0tot->Write();
+	zone1CSC->Write();
+        zone1tot->Write();
+	zone2CSC->Write();
+        zone2tot->Write();
+	zone3CSC->Write();
+        zone3tot->Write();
+
+	Total_Counts->cd();
+
 	eta->Write();
 	phi->Write();
 	station->Write();
 	chamber->Write();
 	lct_count->Write();
+
+	Cluster_Counts->cd();
 
 	eta_group->Write();
 	phi_group->Write();
