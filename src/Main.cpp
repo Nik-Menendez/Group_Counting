@@ -47,14 +47,18 @@ int main() {
 	// END LOAD FILES
 
 	// DECLARE HISTOGRAMS	
-	TH1F* zone0CSC = new TH1F("zone0CSC", "nHits in Zone 0 CSCs", 50, 0, 50);
-	TH1F* zone0tot = new TH1F("zone0tot", "nHits in Zone 0", 50, 0, 50);
-	TH1F* zone1CSC = new TH1F("zone1CSC", "nHits in Zone 1 CSCs", 50, 0, 50);
-        TH1F* zone1tot = new TH1F("zone1tot", "nHits in Zone 1", 50, 0, 50);
-	TH1F* zone2CSC = new TH1F("zone2CSC", "nHits in Zone 2 CSCs", 50, 0, 50);
-        TH1F* zone2tot = new TH1F("zone2tot", "nHits in Zone 2", 50, 0, 50);
-	TH1F* zone3CSC = new TH1F("zone3CSC", "nHits in Zone 3 CSCs", 50, 0, 50);
-        TH1F* zone3tot = new TH1F("zone3tot", "nHits in Zone 3", 50, 0, 50);
+	TH1F* zone0CSC = new TH1F("zone0CSC", "nHits in Zone 0 CSCs", 35, 0, 35);
+	TH1F* zone0RPC = new TH1F("zone0RPC", "nHits in Zone 0 RPCs", 35, 0, 35);
+	TH1F* zone0tot = new TH1F("zone0tot", "nHits in Zone 0", 35, 0, 35);
+	TH1F* zone1CSC = new TH1F("zone1CSC", "nHits in Zone 1 CSCs", 35, 0, 35);
+	TH1F* zone1RPC = new TH1F("zone1RPC", "nHits in Zone 1 RPCs", 35, 0, 35);
+        TH1F* zone1tot = new TH1F("zone1tot", "nHits in Zone 1", 35, 0, 35);
+	TH1F* zone2CSC = new TH1F("zone2CSC", "nHits in Zone 2 CSCs", 35, 0, 35);
+        TH1F* zone2RPC = new TH1F("zone2RPC", "nHits in Zone 2 RPCs", 35, 0, 35);
+	TH1F* zone2tot = new TH1F("zone2tot", "nHits in Zone 2", 35, 0, 35);
+	TH1F* zone3CSC = new TH1F("zone3CSC", "nHits in Zone 3 CSCs", 35, 0, 35);
+        TH1F* zone3RPC = new TH1F("zone3RPC", "nHits in Zone 3 RPCs", 35, 0, 35);
+	TH1F* zone3tot = new TH1F("zone3tot", "nHits in Zone 3", 35, 0, 35);
 	TH1F* zone0sec = new TH1F("zone0sec", "Sectors of Hits in Zone 0", 12, 0, 12);
 	TH1F* zone1sec = new TH1F("zone1sec", "Sectors of Hits in Zone 1", 12, 0, 12);
 	TH1F* zone2sec = new TH1F("zone2sec", "Sectors of Hits in Zone 2", 12, 0, 12);
@@ -84,11 +88,11 @@ int main() {
                 vector< vector<float> > trk_location; //Vector to store information on the hit
 		vector< vector<float> > grouping; //Vector to compare hits in a grouping to each other
 		vector<int> zone_counts; //Vector to store how many hits in a zone
-		for (int i=0;i<8;i++) {zone_counts.push_back(0);}
+		for (int i=0;i<12;i++) {zone_counts.push_back(0);}
        		unsigned int vec_row = -1;
 		bool flag = false;
 		int lct_cnt = 0;
-		int last_j = 0;
+		unsigned int last_j = 0;
 		int zone_add = 1;
 		
 		// STORE HIT INFORMATION IN VECTOR
@@ -102,7 +106,7 @@ int main() {
                 	trk_location[i_track].push_back(ntuple.I("hit_BX",i_track));
 			trk_location[i_track].push_back(ntuple.I("hit_isCSC",i_track));
 			trk_location[i_track].push_back(ntuple.I("hit_quality",i_track));
-			trk_location[i_track].push_back(ntuple.F("hit_theta",i_track));
+			trk_location[i_track].push_back(ntuple.I("hit_theta_int",i_track));
 			trk_location[i_track].push_back(ntuple.I("hit_sector_index",i_track));
 		}
 
@@ -113,46 +117,55 @@ int main() {
 
 		// LOOP OVER HITS
 		for (unsigned int i=0;i<trk_location.size();i++) {
-                        if (trk_location[i][4] == 1 || !(trk_location[i][5] == 0 /*&& trk_location[i][6] == 1 && trk_location[i][7] > -100*/)) {continue;} //checks they aren't neighbor and are BX0			
+                        if (/*trk_location[i][4] == 1 ||*/ !(trk_location[i][5] == 0 /*&& trk_location[i][6] == 1 && trk_location[i][7] > -100*/)) {continue;} //checks they aren't neighbor and are BX0			
 			// Compares the hits to each other to check if they're in the same sector and then record what zone they're in
-			for (unsigned int j=i;j<trk_location.size();j++) {
+			for (unsigned int j=(i+1);j<trk_location.size();j++) {
+
+				if (!(trk_location[i][5] == 0)) {continue;}
 
 				if (trk_location[i][9] != trk_location[j][9]) {
 					break;
-				} else if (trk_location[i][9] == trk_location[j][9]) {
-					if (trk_location[i][8] >= 8.5 && trk_location[i][8] <= 20.8) {
-                                		if (trk_location[i][6] == 0) {
+				} else {
+					if (trk_location[j][8] >= 0 && trk_location[j][8] <= 43) {
+                                		if (trk_location[j][6] == 0) {
                                         		zone_counts[0]+=zone_add;
-                                		}
-                                		zone_counts[1]+=zone_add;
-						zone0sec->Fill(trk_location[i][9]);
-                        		} else if (trk_location[i][8] >= 19.9 && trk_location[i][8] <= 23.0) {
-                                		if (trk_location[i][6] == 0) {
-                                        		zone_counts[2]+=zone_add;
-                                		}
-                                		zone_counts[3]+=zone_add;
-						zone1sec->Fill(trk_location[i][9]);
-                        		} else if (trk_location[i][8] >= 22.2 && trk_location[i][8] <= 33.9) {
-                                		if (trk_location[i][6] == 0) {
-                                        		zone_counts[4]+=zone_add;
-                                		}
+                                		} else {
+							zone_counts[1]+=zone_add;
+						}
+                                		zone_counts[2]+=zone_add;
+						zone0sec->Fill(trk_location[j][9]);
+                        		} else if (trk_location[j][8] >= 40 && trk_location[j][8] <= 51) {
+                                		if (trk_location[j][6] == 0) {
+                                        		zone_counts[3]+=zone_add;
+                                		} else {
+							zone_counts[4]+=zone_add;
+						}
                                 		zone_counts[5]+=zone_add;
-						zone2sec->Fill(trk_location[i][9]);
-                        		} else if (trk_location[i][8] >= 33.0 && trk_location[i][8] <= 44.7) {
-                                		if (trk_location[i][6] == 0) {
-                                       		 zone_counts[6]+=zone_add;
-                                		}
-                         		        zone_counts[7]+=zone_add;
-						zone3sec->Fill(trk_location[i][9]);
+						zone1sec->Fill(trk_location[j][9]);
+                        		} else if (trk_location[j][8] >= 48 && trk_location[j][8] <= 89) {
+                                		if (trk_location[j][6] == 0) {
+                                        		zone_counts[6]+=zone_add;
+                                		} else {
+							zone_counts[7]+=zone_add;
+						}
+                                		zone_counts[8]+=zone_add;
+						zone2sec->Fill(trk_location[j][9]);
+                        		} else if (trk_location[j][8] >= 86 && trk_location[j][8] <= 127) {
+                                		if (trk_location[j][6] == 0) {
+                                       			zone_counts[9]+=zone_add;
+                                		} else {
+							zone_counts[10]+=zone_add;
+						}
+                         		        zone_counts[11]+=zone_add;
+						zone3sec->Fill(trk_location[j][9]);
                         		}
 				}
 				last_j = j;
 			}
 
-			i=last_j;
+			if (i<last_j) {i=last_j;}
 
-			
-		} 
+		}
 
 		////////////////////////////////////////////////// GENERAL GROUPINGS SECTION ///////////////////////////////////////////
 
@@ -205,23 +218,19 @@ int main() {
 		}
 
 		// Fill zone count histograms. If it has 1 or 0 hits, just fills 0.
-		if (zone_counts[0] >= 2) {zone0CSC->Fill(zone_counts[0]);
-		} else {zone0CSC->Fill(0);}
-		if (zone_counts[1] >= 2) {zone0tot->Fill(zone_counts[1]);
-                } else {zone0tot->Fill(0);}
-		if (zone_counts[2] >= 2) {zone1CSC->Fill(zone_counts[2]);
-                } else {zone1CSC->Fill(0);}
-		if (zone_counts[3] >= 2) {zone1tot->Fill(zone_counts[3]);
-                } else {zone1tot->Fill(0);}
-		if (zone_counts[4] >= 2) {zone2CSC->Fill(zone_counts[4]);
-                } else {zone2CSC->Fill(0);}
-		if (zone_counts[5] >= 2) {zone2tot->Fill(zone_counts[5]);
-                } else {zone2tot->Fill(0);}
-		if (zone_counts[6] >= 2) {zone3CSC->Fill(zone_counts[6]);
-                } else {zone3CSC->Fill(0);}
-		if (zone_counts[7] >= 2) {zone3tot->Fill(zone_counts[7]);
-                } else {zone3tot->Fill(0);}
-		zone_count.clear();
+		zone0CSC->Fill(zone_counts[0]);
+		zone0RPC->Fill(zone_counts[1]);
+		zone0tot->Fill(zone_counts[2]);
+		zone1CSC->Fill(zone_counts[3]);
+		zone1RPC->Fill(zone_counts[4]);
+		zone1tot->Fill(zone_counts[5]);
+		zone2CSC->Fill(zone_counts[6]);
+		zone2RPC->Fill(zone_counts[7]);
+		zone2tot->Fill(zone_counts[8]);
+		zone3CSC->Fill(zone_counts[9]);
+		zone3RPC->Fill(zone_counts[10]);
+		zone3tot->Fill(zone_counts[11]);
+		zone_counts.clear();
 
 		group_count->Fill(group_cnt);
 		lct_count->Fill(lct_cnt);
@@ -243,12 +252,16 @@ int main() {
 	Zone_Counts->cd();
 
 	zone0CSC->Write();
+	zone0RPC->Write();
 	zone0tot->Write();
 	zone1CSC->Write();
+	zone1RPC->Write();
         zone1tot->Write();
 	zone2CSC->Write();
+	zone2RPC->Write();
         zone2tot->Write();
 	zone3CSC->Write();
+	zone3RPC->Write();
         zone3tot->Write();
 
 	zone0sec->Write();
