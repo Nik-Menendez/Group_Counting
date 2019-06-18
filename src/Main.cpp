@@ -126,7 +126,7 @@ int main() {
 				if (trk_location[i][9] != trk_location[j][9]) {
 					break;
 				} else {
-					if (trk_location[j][8] >= 0 && trk_location[j][8] <= 43) {
+					if (trk_location[j][8] >= 0 && trk_location[j][8] <= 43  && trk_location[i][8] >= 0 && trk_location[i][8] <= 43) {
                                 		if (trk_location[j][6] == 0) {
                                         		zone_counts[0]+=zone_add;
                                 		} else {
@@ -134,7 +134,7 @@ int main() {
 						}
                                 		zone_counts[2]+=zone_add;
 						zone0sec->Fill(trk_location[j][9]);
-                        		} else if (trk_location[j][8] >= 40 && trk_location[j][8] <= 51) {
+                        		} else if (trk_location[j][8] >= 40 && trk_location[j][8] <= 51 && trk_location[i][8] >= 40 && trk_location[i][8] <= 51) {
                                 		if (trk_location[j][6] == 0) {
                                         		zone_counts[3]+=zone_add;
                                 		} else {
@@ -142,7 +142,7 @@ int main() {
 						}
                                 		zone_counts[5]+=zone_add;
 						zone1sec->Fill(trk_location[j][9]);
-                        		} else if (trk_location[j][8] >= 48 && trk_location[j][8] <= 89) {
+                        		} else if (trk_location[j][8] >= 48 && trk_location[j][8] <= 89 && trk_location[i][8] >= 48 && trk_location[i][8] <= 89) {
                                 		if (trk_location[j][6] == 0) {
                                         		zone_counts[6]+=zone_add;
                                 		} else {
@@ -150,7 +150,7 @@ int main() {
 						}
                                 		zone_counts[8]+=zone_add;
 						zone2sec->Fill(trk_location[j][9]);
-                        		} else if (trk_location[j][8] >= 86 && trk_location[j][8] <= 127) {
+                        		} else if (trk_location[j][8] >= 86 && trk_location[j][8] <= 127 && trk_location[i][8] >= 48 && trk_location[i][8] <= 89) {
                                 		if (trk_location[j][6] == 0) {
                                        			zone_counts[9]+=zone_add;
                                 		} else {
