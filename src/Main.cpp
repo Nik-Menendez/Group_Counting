@@ -39,17 +39,21 @@ bool sortcol2 ( const vector<float>& v1, const vector<float>& v2 ) {
 // MAIN
 int main() {
 	// RUN VARS
-	//const std::string data_store = "data/FlatNtuple_Run_2018D_v2_2018_10_25_ZeroBias_PU50_postSep26/181025_144026/0000/";
-	const std::string data_store = "data/";
+	unsigned int isMC = 1;
 	// END RUN VARS
 
 	emtf::FlatNTupleEngine engine;
 
-	// LOAD FILES
-	//for (unsigned int j = 1; j <= 7; j++) {
-	//	engine.addRootFile(data_store + "tuple_" + std::to_string(j) + ".root");
-	//}
-	engine.addRootFile(data_store + "EMTF_ppTohToSS1SS2_SS1Tobb_SS2Tobb_ggh_withISR.root");
+        // LOAD FILES
+        if (isMC==1) {
+		const std::string data_store = "data/";
+		engine.addRootFile(data_store + "EMTF_ppTohToSS1SS2_SS1Tobb_SS2Tobb_ggh_withISR.root");
+	} else {
+		const std::string data_store = "data/FlatNtuple_Run_2018D_v2_2018_10_25_ZeroBias_PU50_postSep26/181025_144026/0000/";
+		for (unsigned int j = 1; j <= 7; j++) {
+        		engine.addRootFile(data_store + "tuple_" + std::to_string(j) + ".root");
+        	}
+	}
 	// END LOAD FILES
 
 	int total_csc = 0;
@@ -93,18 +97,6 @@ int main() {
 
 	TH2F* stationCorrelation = new TH2F("stationCorrelation", "nHits in Stations 2 and 3 in a Single Zone;nHits (Station 2);nHits (Station 3)", 6, -.5, 5.5, 6, -.5, 5.5);
 
-//	TH1F* eta = new TH1F("eta", "Eta values of hits", 50, -2.5, 2.5);
-//	TH1F* phi = new TH1F("phi", "Phi values of hits", 100, -200, 200);
-//	TH1F* station = new TH1F("station", "Station hit", 5, 0, 5);
-//	TH1F* chamber = new TH1F("chamber", "Chamber hit", 36, 0, 36);
-//	TH1F* group_count = new TH1F("group_count", "Group Count", 10, -.5, 9.5);
-//	TH1F* lct_count = new TH1F("lct_count", "Total LCT Count", 50, 0, 50);
-//	TH1F* eta_group = new TH1F("eta_group", "Eta values of hits", 50, -2.5, 2.5);
-//	TH1F* phi_group = new TH1F("phi_group", "Phi values of hits", 100, -200, 200);
-//	TH1F* station_group = new TH1F("station_group", "Station hit", 5, 0, 5);
-//	TH1F* chamber_group = new TH1F("chamber_group", "Chamber hit", 36, 0, 36);
-//	TH1F* group_size = new TH1F("group_size", "Number of Hits in a Group", 6, 0, 6);
-//	TH1F* delt_phi = new TH1F("delt_phi", "Difference in Phi Values", 200, 0, 4);
 	TH2I* delt_pos_with_OL = new TH2I("delt_pos_with_OL", "Difference in Phi and Theta Values with Overlap", 120, -120, 120, 10, -5, 5);
 	TH2I* delt_pos_wout_OL = new TH2I("delt_pos_wout_OL", "Difference in Phi and Theta Values without Overlap", 120, -120, 120, 10, -5, 5);
 	TH1I* delt_phi_with_OL = new TH1I("delt_phi_with_OL", "Difference in Phi Values with Overlap", 20, -10, 10);
@@ -154,25 +146,11 @@ int main() {
                         trk_location[i_track].push_back(ntuple.F("hit_phi", i_track));             // 13
                         trk_location[i_track].push_back(ntuple.I("hit_quality", i_track));         // 14
 
-			//trk_location[i_track].push_back(ntuple.F(/*"hit_*/"eta",i_track));  		// 0
-			//trk_location[i_track].push_back(ntuple.I(/*"hit_*/"phi_int",i_track));		// 1
-			//trk_location[i_track].push_back(ntuple.I(/*"hit_*/"station",i_track));		// 2
-			//trk_location[i_track].push_back(ntuple.I(/*"hit_*/"chamber",i_track));		// 3
-			//trk_location[i_track].push_back(ntuple.I(/*"hit_*/"neighbor",i_track));		// 4
-                	//trk_location[i_track].push_back(ntuple.I(/*"hit_*/"BX",i_track));		// 5
-			//trk_location[i_track].push_back(ntuple.I(/*"hit_*/"isCSC",i_track));		// 6
-			//trk_location[i_track].push_back(ntuple.I(/*"hit_*/"quality",i_track));		// 7
-			//trk_location[i_track].push_back(ntuple.I(/*"hit_*/"theta_int",i_track));	// 8
-			//trk_location[i_track].push_back(ntuple.I(/*"hit_*/"sector_index",i_track));	// 9
-			//trk_location[i_track].push_back(ntuple.I(/*"hit_*/"endcap",i_track));		// 10
-			//trk_location[i_track].push_back(ntuple.I(/*"hit_*/"sector",i_track));		// 11
-			//trk_location[i_track].push_back(ntuple.I(/*"hit_*/"ring",i_track));		// 12
-			//trk_location[i_track].push_back(ntuple.F(/*"hit_*/"phi", i_track)); 		// 13
-			//trk_location[i_track].push_back(ntuple.I(/*"hit_*/"quality", i_track));		// 14
-
 			//cout << "Hit has isCSC " << trk_location[i_track][6] << ", endcap " << trk_location[i_track][10] << ", sector " << trk_location[i_track][11] << ", sector index " << trk_location[i_track][9] << ", station " << trk_location[i_track][2] << ", ring " << trk_location[i_track][12] << ", chamber " << trk_location[i_track][3] << ", phi_int " << trk_location[i_track][1] << ", theta_int " << trk_location[i_track][8] << ", phi " << trk_location[i_track][13] << ", eta " << trk_location[i_track][0] << ", quality " << trk_location[i_track][14]  << endl;
 		}
-		
+	
+		// REMOVE EVENTS NOT FROM BX 0
+	
 //		for (unsigned int i_track=0;i_track<trk_location.size();i_track++) {
 //			if (trk_location[i_track][5]!=0) {
 //				trk_location.erase(trk_location.begin() + i_track);
@@ -265,7 +243,7 @@ int main() {
 						zone_counts[pi-1] = rpc_count;
 						zone_counts_minus1[pi/3] = minus1_count;
 
-						//Read out large events
+						// READ OUT LARGE EVENTS
 //			                        if (zone_counts[pi-2] >= 7){
 //						if  (pi/3==2) {
 //			                                cout << "//////////////////////////////////////////" << endl;
@@ -385,105 +363,6 @@ int main() {
 
 		}
 
-//		for (unsigned int i=0;i<zone_counts.size();i++) {
-//			if (zone_counts[i] >= 10) {
-//				cout << "//////////////////////////////////////////" << endl;
-//				cout << "Zone " << i/3 << " has " << zone_counts[i] << " hits." << endl;
-//				for (unsigned int j=0;j<trk_location.size();j++) {
-//					if (trk_location[j][5]!=0) {continue;}
-//
-//					if (trk_location[j][10]==(i/3)) {
-//						cout << "Hit has phi " << trk_location[j][1] << ", theta " << trk_location[j][8] << ", chamber " << trk_location[j][3] << ", sector " << trk_location[j][9] << " in zone " << trk_location[j][10] << endl;
-//					}
-//				}
-//				flag=true;
-//			}
-//		}
-//
-//		if (flag) {
-//			cout << "//////////////////////////////////////////" << endl;
-//			flag=false;
-//		}
-
-		////////////////////////////////////////////////// GENERAL GROUPINGS SECTION ///////////////////////////////////////////
-
-		// SORT BY ETA TO SEE FOR EASY GENERAL GROUPINGS
-//		sort(trk_location.begin(), trk_location.end(), sortcol1);
-
-//		for (unsigned int i=0;i<trk_location.size();i++) {
-//			if (trk_location[i][4] == 1 || !(trk_location[i][5] == 0 /*&& trk_location[i][6] == 1 && trk_location[i][7] > -100*/)) {continue;}
-//
-//			if (!(trk_location[i][6] == 1)) {continue;}
-//
-//			eta->Fill(trk_location[i][0]);
-//			phi->Fill(trk_location[i][1]);
-//			station->Fill(trk_location[i][2]);
-//			chamber->Fill(trk_location[i][3]);
-//			lct_cnt++;
-//
-//			for (unsigned int j=i;j<trk_location.size();j++) {
-//
-//				if (abs(trk_location[i][0]-trk_location[j][0]) < .1 && abs(trk_location[i][1]-trk_location[j][1]) < 4 /*&& trk_location[i][2] > 1 */&& trk_location[i][2] == trk_location[j][2] /*&& trk_location[i][3] == trk_location[j][3]*/){
-//					flag = false;
-//					delt_phi->Fill(trk_location[i][1] - trk_location[j][1]);
-//					for (unsigned int test=0;test<grouping.size();test++) {
-//						if (grouping[test][0] == trk_location[j][0] && abs(grouping[test][1] - trk_location[j][1]) < 1 && grouping[test][3] != trk_location[j][3] && (abs(fmod(grouping[test][1],10)) < 1 || abs(fmod(grouping[test][1],10) > 9))) {
-//							cout << "We got an overlap yo at phi " << trk_location[j][1] << " and phi " << grouping[test][1] << endl;
-//							flag = true;
-//							break;
-//						}
-//					} if (flag) {continue;}
-//					grouping.push_back(vector<float>());
-//					vec_row++;
-//					for (unsigned int k=0;k<4;k++) {
-//						grouping[vec_row].push_back(trk_location[j][k]);
-//					}
-//				}
-//			}
-//			if (grouping.size() >= 3) {
-//				group_cnt++;
-//				i=i+grouping.size();
-//				for (unsigned int k=0;k<grouping.size();k++) {
-//					eta_group->Fill(grouping[k][0]);
-//					phi_group->Fill(grouping[k][1]);
-//					station_group->Fill(grouping[k][2]);
-//					chamber_group->Fill(grouping[k][3]);
-//				}
-//				group_size->Fill(grouping.size());
-//			}
-//			grouping.clear();
-//			vec_row = -1;
-//		}
-
-//		for (unsigned int i=0;i<trk_location.size();i++) {
-//			if (!(trk_location[i][5] == 0)) {continue;}
-//
-//			for (unsigned int j=i+1;j<trk_location.size();j++) {
-//				if (!(trk_location[j][5] == 0)) {continue;}
-//
-//				delt_pos->Fill(trk_location[i][1] - trk_location[j][1], trk_location[i][0] - trk_location[j][0]);
-//			}
-//	
-//		}
-
-		// Fill zone count histograms. If it has 1 or 0 hits, just fills 0.
-//		zone0CSC->Fill(zone_counts[0]);
-//		zone0RPC->Fill(zone_counts[1]);
-//		zone0tot->Fill(zone_counts[2]);
-//		zone1CSC->Fill(zone_counts[3]);
-//		zone1RPC->Fill(zone_counts[4]);
-//		zone1tot->Fill(zone_counts[5]);
-//		zone2CSC->Fill(zone_counts[6]);
-//		zone2RPC->Fill(zone_counts[7]);
-//		zone2tot->Fill(zone_counts[8]);
-//		zone3CSC->Fill(zone_counts[9]);
-//		zone3RPC->Fill(zone_counts[10]);
-//		zone3tot->Fill(zone_counts[11]);
-//		zone_counts.clear();
-
-//		group_count->Fill(group_cnt);
-//		lct_count->Fill(lct_cnt);
-//		group_cnt = 0;
 		trk_location.clear();
 
 
@@ -552,23 +431,8 @@ int main() {
 	zone2Minus1->Write();zone2Minus1->Draw();c->SaveAs("plots/pdfs/zone2Minus1.pdf");
 	zone3Minus1->Write();zone3Minus1->Draw();c->SaveAs("plots/pdfs/zone3Minus1.pdf");
 
-//	Total_Counts->cd();
-//
-//	eta->Write();
-//	phi->Write();
-//	station->Write();
-//	chamber->Write();
-//	lct_count->Write();
-//
 	Chamber_Overlap->cd();
-//
-//	eta_group->Write();
-//	phi_group->Write();
-//	station_group->Write();
-//	chamber_group->Write();
-//	group_count->Write();
-//
-//	delt_phi->Write();
+
 	delt_pos_with_OL->Write();
 	delt_pos_wout_OL->Write();	
 	delt_phi_with_OL->Write();
