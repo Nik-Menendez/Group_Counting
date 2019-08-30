@@ -22,7 +22,8 @@ void FlatNTupleEngine::addRootFile(const std::string& file_path) {
 }
 
 void FlatNTupleEngine::forEachEvent(const std::function<void(unsigned int, const FlatNTuple&) >& consumer) const {
-	TChain chain("FlatNtupleData/tree");
+	//TChain chain("FlatNtupleData/tree");
+	TChain chain("FlatNtupleMC/tree");
 	const unsigned int file_count = files.size();
 
 	std::cout << "****************************************" << std::endl;

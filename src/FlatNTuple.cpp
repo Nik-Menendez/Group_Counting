@@ -30,6 +30,8 @@ const std::vector<TString> longs = {
 
 const std::vector<TString> vFlt = {
 	{
+		"eta", "theta", "phi", "phi_loc",
+
 		"hit_eta", "hit_theta", "hit_phi", "hit_phi_loc",
 		"hit_eta_sim", "hit_theta_sim", "hit_phi_sim",
 		"sim_hit_eta", "sim_hit_theta", "sim_hit_phi", "sim_hit_phi_loc",
@@ -63,6 +65,10 @@ const std::vector<TString> vFlt = {
 
 const std::vector<TString> vInt = {
 	{
+		"eta_int", "theta_int", "phi_int", "endcap", "sector", "sector_index", "station",
+                "ring", "CSC_ID", "chamber", "FR", "pattern", "quality", "roll", "subsector",
+                "isCSC", "isRPC", "valid", "BX", "strip", "strip_hi", "strip_low", "wire", "neighbor",
+
 		"hit_eta_int", "hit_theta_int", "hit_phi_int", "hit_endcap", "hit_sector", "hit_sector_index", "hit_station",
 		"hit_ring", "hit_CSC_ID", "hit_chamber", "hit_FR", "hit_pattern", "hit_quality", "hit_roll", "hit_subsector",
 		"hit_isCSC", "hit_isRPC", "hit_valid", "hit_BX", "hit_strip", "hit_strip_hi", "hit_strip_low", "hit_wire", "hit_neighbor",
